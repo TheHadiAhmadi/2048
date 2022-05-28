@@ -2,24 +2,6 @@
 import { onMount } from 'svelte';
 
     import 'virtual:windi.css';
-
-onMount(() => {
-
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker
-        .register('/service-worker.js', { scope: '/' })
-        .then(() => {
-            console.info('2048 Game Service Worker Registered');
-        }, err => console.error("2048 Game Service Worker registration failed: ", err));
-
-    navigator.serviceWorker
-        .ready
-        .then(() => {
-            console.info('2048 Game Service Worker Ready');
-        });
-    }
-})
-
 </script>  
 <slot/>
 
