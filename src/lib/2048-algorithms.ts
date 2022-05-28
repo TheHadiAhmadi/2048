@@ -45,7 +45,19 @@ export default class Game2048 {
 	}
 
 	isFull() {
-		this._findZeroCount() === 0;
+		let isAdjacentValues = false
+		for(let i=0; i<this.y -1; i++) {
+			for(let j=0; j<this.x -1; j++) {
+				if(this.data[i][j].value === this.data[i][j+1].value) {
+					isAdjacentValues= true
+				}
+				if(this.data[i][j].value === this.data[i+1][j].value) {
+					isAdjacentValues = true
+				}
+			}
+		}
+
+		return this._findZeroCount() === 0 && !isAdjacentValues;
 	}
 
 	_getRandomValue() {
