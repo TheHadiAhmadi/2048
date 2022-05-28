@@ -20,13 +20,7 @@
 		data = game.getData();
 		score = game.getScore();
 
-		game.debug();
-		if (game.isFull()) {
-			console.log('gameOver');
-			localStorage.setItem('best-score', JSON.stringify(Math.max(score, bestScore)));
-			gameOver = true;
-			return;
-		}
+		if(gameOver) return;
 
 		let savedPositions: any = {};
 		Object.entries(activeTiles).map(([key, value]) => {
@@ -46,6 +40,14 @@
 				activeTiles[tile.id].value = tile.value;
 			}
 		}
+		if (game.isFull()) {
+			console.log('gameOver');
+			localStorage.setItem('best-score', JSON.stringify(Math.max(score, bestScore)));
+			gameOver = true;
+			
+			return;
+		}
+
 	}
 
 	function clickLeft() {
@@ -134,16 +136,24 @@
 	}
 </script>
 
+
+<div 
+use:drag={{ axis: 'both', handleMove }}
+
+class="w-full h-full px-2 py-6 bg-gradient-to-br from-yellow-200 to-orange-200">
+	<div class="h-full max-w-300px sm:max-w-400px md:max-w-500px mx-auto">
+
+
 <div class="flex w-full items-center">
 	<div class="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-700 flex-1">2048</div>
 	<div class="flex flex-row gap-1">
 		<div class="score-btn">
-			<span class="text-center font-bold text-gray-400 uppercase text-sm">score</span>
-			<div class="text-2xl font-bold text-gray-300">{score}</div>
+			<span class="text-center font-bold text-gray-200 uppercase text-xs">score</span>
+			<div class="text-2xl font-bold text-gray-100">{score}</div>
 		</div>
 		<div class="score-btn">
-			<span class="text-center font-bold text-gray-400 uppercase text-sm">best</span>
-			<div class="text-xl font-bold text-gray-300">{Math.max(score, bestScore)}</div>
+			<span class="text-center font-bold text-gray-200 uppercase text-xs">best</span>
+			<div class="text-xl font-bold text-gray-100">{Math.max(score, bestScore)}</div>
 		</div>
 	</div>
 </div>
@@ -152,28 +162,29 @@
 	<p class="text-gray-600 flex-1">
 		Join the tiles, get to <b class="font-bold">2048!</b>
 	</p>
-	<button on:click={reset} class="sm:hidden py-1 px-5 ml-4 font-bold rounded bg-gray-700 text-white"
+	<button on:click={reset} class="sm:hidden py-1 px-5 ml-4 font-bold rounded bg-gray-700/30 hover:bg-gray-700/40 text-white"
 		>New</button
 	>
 	<button
 		on:click={reset}
-		class="hidden sm:block py-1 px-5 ml-4 font-bold rounded bg-gray-700 text-white">New Game</button
+		class="hidden sm:block  py-1 px-5 ml-4 font-bold rounded bg-gray-700/30 hover:bg-gray-700/40 text-white">New Game</button
 	>
 </div>
-<div class="flex flex-col">
+<div 
+		class="flex flex-col">
 	{#if gameOver}
 		<div
-			class="absolute z-1 left-0 right-0 top-0 bottom-0 font-bold text-gray-800 w-full h-full bg-gray-500/20 flex flex-col items-center justify-center text-3xl text-shadow"
+			class="absolute z-1 left-0 right-0 top-0 bottom-0 font-bold text-gray-800 w-full h-full bg-gray-200/30 backdrop-filter  backdrop-blur-sm flex flex-col items-center justify-center text-5xl text-shadow"
 		>
 			<span>Game Over</span>
-			<button on:click={reset} class="p-2 mt-4 text-sm bg-gray-800 text-white shadow rounded"
+			<span class="text-lg font-semibold mt-2">Your Score was: <b class="font-extrabold">{score}</b></span>
+			<button on:click={reset} class="px-6 py-4 mt-8 text-xl font-extrabold bg-gray-800 hover:bg-gray-700 hover:shadow-lg text-white shadow rounded"
 				>Reload</button
 			>
 		</div>
 	{/if}
 
 	<div
-		use:drag={{ axis: 'both', handleMove }}
 		bind:this={board}
 		class="relative rounded w-300px sm:w-400px sm:h-400px md:(w-500px h-500px) p-0.75 h-300px grid grid-cols-4 grid-rows-4 bg-gray-400"
 	>
@@ -245,4 +256,6 @@
 		<button on:click={() => showButtons = true} class="sm:hidden p-2 bg-gray-500/20 border border-gray-500/30  hover:bg-gray-500/30 text-black rounded mt-2">Show Buttons</button>
 	{/if}
 	{/if}
+</div>
+</div>
 </div>
