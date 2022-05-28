@@ -46,8 +46,8 @@ export default class Game2048 {
 
 	isFull() {
 		let isAdjacentValues = false
-		for(let i=0; i<this.y -1; i++) {
-			for(let j=0; j<this.x -1; j++) {
+		for(let i=0; i<this.y; i++) {
+			for(let j=0; j<this.x; j++) {
 				if(this.data[i][j].value === this.data[i][j+1].value) {
 					isAdjacentValues= true
 				}

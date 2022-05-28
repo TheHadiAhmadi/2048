@@ -157,7 +157,7 @@
 </div>
 <div class="flex flex-col sm:flex-row">
 	{#if gameOver}
-	<div class="h-300px w-300px font-bold text-gray-800 w-full h-full bg-gray-500/20 flex flex-col items-center justify-center text-3xl text-shadow">
+	<div class="absolute z-1 left-0 right-0 top-0 bottom-0 font-bold text-gray-800 w-full h-full bg-gray-500/20 flex flex-col items-center justify-center text-3xl text-shadow">
 		<span>Game Over</span>
 		<button on:click={reset} class="p-2 mt-4 text-sm bg-gray-800 text-white shadow rounded">Reload</button>
 
