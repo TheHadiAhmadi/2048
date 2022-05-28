@@ -12,6 +12,7 @@
 	let data = game.getData();
 	let prevData = game.getData();
 
+	let showButtons =false;
 	let gameOver = false;
 
 	function updateData() {
@@ -67,8 +68,7 @@
 	let tiles: any[][] = [[], [], [], []];
 	let positions = [[], [], [], []];
 
-	$: {
-	}
+	let showShowButton = false
 
 	let activeTiles: Record<string, any> = {};
 
@@ -93,37 +93,38 @@
 			}
 		}
 
+		if(window.innerHeight < 700) {
+			showShowButton = false
+		} else {
+			showShowButton = true
+
+		}
 		updateData();
 	});
 
-	function handleEnd({ detail }) {
-		console.log(detail);
-	}
 	function handleMove({ detail }) {
 		console.log(detail);
 		const dx = detail.delta[0];
 		const dy = detail.delta[1];
 		if (dy > -20 && dy < 20) {
-			if (dx < -60) {
+			if (dx < -40) {
 				clickLeft();
 				detail.cancel();
-			} else if (dx > 60) {
+			} else if (dx > 40) {
 				clickRight();
 				detail.cancel();
 			}
 		} else if (dx > -20 && dx < 20) {
-			if (dy < -60) {
+			if (dy < -40) {
 				clickTop();
 				detail.cancel();
-			} else if (dy > 60) {
+			} else if (dy > 40) {
 				clickBottom();
 				detail.cancel();
 			}
 		}
 	}
-	function handleStart({ detail }) {
-		console.log(detail);
-	}
+
 
 	function reset() {
 		game.reset();
@@ -159,7 +160,7 @@
 		class="hidden sm:block py-1 px-5 ml-4 font-bold rounded bg-gray-700 text-white">New Game</button
 	>
 </div>
-<div class="flex flex-col sm:flex-row">
+<div class="flex flex-col">
 	{#if gameOver}
 		<div
 			class="absolute z-1 left-0 right-0 top-0 bottom-0 font-bold text-gray-800 w-full h-full bg-gray-500/20 flex flex-col items-center justify-center text-3xl text-shadow"
@@ -172,7 +173,7 @@
 	{/if}
 
 	<div
-		use:drag={{ axis: 'both', handleEnd, handleMove, handleStart }}
+		use:drag={{ axis: 'both', handleMove }}
 		bind:this={board}
 		class="relative rounded w-300px sm:w-400px sm:h-400px md:(w-500px h-500px) p-0.75 h-300px grid grid-cols-4 grid-rows-4 bg-gray-400"
 	>
@@ -206,7 +207,11 @@
 		{/each}
 	</div>
 
-	<div class="sm:hidden mt-4 right-50 flex flex-col items-center justify-center gap-2 mb-2">
+	{#if showButtons}
+	<div class="sm:hidden relative left-0 right-0 top-0 w-full p-2 bg-gray-500/20 border border-gray-500/30 rounded shadow mt-4 right-50 flex flex-col items-center justify-center gap-2 mb-2">
+		<button on:click={() => showButtons=false} class="absolute top-0 right-0 py-0 px-2 text-black/30 text-4xl">
+			&times;
+		</button>
 		<div
 			on:click={clickTop}
 			class="w-20 h-10 flex items-start justify-center p-1 bg-gray-400/90 shadow hover:shadow-lg cursor-pointer text-white text-shadow rounded hover:bg-gray-400"
@@ -235,4 +240,9 @@
 			Bottom
 		</div>
 	</div>
+	{:else}
+	{#if showShowButton}
+		<button on:click={() => showButtons = true} class="sm:hidden p-2 bg-gray-500/20 border border-gray-500/30  hover:bg-gray-500/30 text-black rounded mt-2">Show Buttons</button>
+	{/if}
+	{/if}
 </div>

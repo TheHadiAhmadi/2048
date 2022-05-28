@@ -38,7 +38,7 @@
 		_in = scale;
 	} else {
         _in = fly
-        params = {duration: 200, x: prevPos.x - position.x, y: prevPos.y - position.y, opacity: 1}
+        params = {duration: 100, x: prevPos.x - position.x, y: prevPos.y - position.y, opacity: 1}
     }
 
 	$: if (number < 100) {
