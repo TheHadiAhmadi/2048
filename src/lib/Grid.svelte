@@ -86,32 +86,8 @@
 	});
 </script>
 
-<div class="flex flex-row gap-2 mb-2">
-	<div
-		on:click={clickLeft}
-		class="p-1 bg-gray-400/90 shadow hover:shadow-lg cursor-pointer text-white text-shadow rounded hover:bg-gray-400"
-	>
-		Left
-	</div>
-	<div
-		on:click={clickRight}
-		class="p-1 bg-gray-400/90 shadow hover:shadow-lg cursor-pointer text-white text-shadow rounded hover:bg-gray-400"
-	>
-		Right
-	</div>
-	<div
-		on:click={clickTop}
-		class="p-1 bg-gray-400/90 shadow hover:shadow-lg cursor-pointer text-white text-shadow rounded hover:bg-gray-400"
-	>
-		Top
-	</div>
-	<div
-		on:click={clickBottom}
-		class="p-1 bg-gray-400/90 shadow hover:shadow-lg cursor-pointer text-white text-shadow rounded hover:bg-gray-400"
-	>
-		Bottom
-	</div>
-</div>
+<div class="flex flex-col sm:flex-row">
+
 <div
 	bind:this={board}
 	class="relative rounded w-300px sm:w-400px sm:h-400px md:(w-500px h-500px) p-0.75 h-300px grid grid-cols-4 grid-rows-4 bg-gray-400"
@@ -138,4 +114,39 @@
 			</div>
 		{/each}
 	{/each}
+</div>
+
+
+<div class="sm:hidden mt-4 right-50 flex flex-col items-center justify-center gap-2 mb-2">
+	<div
+	on:click={clickTop}
+	class="w-20 h-10 flex items-start justify-center p-1 bg-gray-400/90 shadow hover:shadow-lg cursor-pointer text-white text-shadow rounded hover:bg-gray-400"
+>
+	Top
+</div>
+	<div class="flex flex-row gap-4">
+
+	<div
+		on:click={clickLeft}
+		class="w-20 h-10 flex items-start justify-center p-1 bg-gray-400/90 shadow hover:shadow-lg cursor-pointer text-white text-shadow rounded hover:bg-gray-400"
+	>
+		Left
+	</div>
+	<div
+		on:click={clickRight}
+		class="w-20 h-10 flex items-start justify-center p-1 bg-gray-400/90 shadow hover:shadow-lg cursor-pointer text-white text-shadow rounded hover:bg-gray-400"
+	>
+		Right
+	</div>
+</div>
+
+
+	<div
+		on:click={clickBottom}
+		class="w-20 h-10 flex items-start justify-center p-1 bg-gray-400/90 shadow hover:shadow-lg cursor-pointer text-white text-shadow rounded hover:bg-gray-400"
+	>
+		Bottom
+	</div>
+</div>
+
 </div>
