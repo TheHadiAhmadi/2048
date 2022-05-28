@@ -2,6 +2,7 @@
 	import Tile from './Tile.svelte';
 	import Game2048 from './2048-algorithms';
 	import { onMount } from 'svelte';
+	import drag from './drag';
 
 	let board: HTMLDivElement;
 	const game = new Game2048();
@@ -84,11 +85,56 @@
 
 		updateData()
 	});
+
+	function handleEnd({detail}) {
+		console.log(detail)	
+	}
+	function handleMove({detail}) {
+		console.log(detail)	
+		const dx = detail.delta[0]
+		const dy = detail.delta[1]
+		if(dy > -20 && dy < 20) {
+			if(dx < -60) {
+				clickLeft()
+				detail.cancel();
+			} else if(dx > 60) {
+				clickRight()
+				detail.cancel();
+			}
+		} else if(dx > -20 && dx < 20) {
+			if(dy < -60) {
+				clickTop()
+				detail.cancel();
+			} else if(dy > 60) {
+				clickBottom()
+				detail.cancel();
+			}
+		}
+		
+	}
+	function handleStart({detail}) {
+		console.log(detail)	
+		
+	}
+
+	function reset() {
+		game.reset()
+		updateData()
+	}
+
 </script>
 
+<div class="flex flex-row items-center gap-1 my-4">
+	<p class="text-gray-600 flex-1">
+		Join the tiles, get to <b class="font-bold">2048!</b> 
+		
+	</p>
+	<button on:click={reset} class="sm:hidden py-1 px-5 ml-4 font-bold rounded bg-gray-700 text-white">New</button>
+	<button on:click={reset} class="hidden sm:block py-1 px-5 ml-4 font-bold rounded bg-gray-700 text-white">New Game</button>
+</div>
 <div class="flex flex-col sm:flex-row">
 
-<div
+<div use:drag={{axis: 'both', handleEnd, handleMove, handleStart}}
 	bind:this={board}
 	class="relative rounded w-300px sm:w-400px sm:h-400px md:(w-500px h-500px) p-0.75 h-300px grid grid-cols-4 grid-rows-4 bg-gray-400"
 >

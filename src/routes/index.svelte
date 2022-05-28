@@ -21,14 +21,7 @@ let score = 0;
 				</div>
 			</div>
 		</div>
-		<div class="flex flex-row items-center gap-1 my-4">
-            <p class="text-gray-600 flex-1">
-                Join the tiles, get to <b class="font-bold">2048!</b> 
-                
-            </p>
-            <button class="sm:hidden py-1 px-5 ml-4 font-bold rounded bg-gray-700 text-white">New</button>
-            <button class="hidden sm:block py-1 px-5 ml-4 font-bold rounded bg-gray-700 text-white">New Game</button>
-		</div>
+		
         <Grid bind:score/>
 	</div>
 </div>

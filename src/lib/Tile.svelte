@@ -50,7 +50,6 @@
 	}
 </script>
 
-<div class="absolute w-20 h-20" style:bakground-color={colors[256]}></div>
 {#key params}
 <div
 bind:this={el}
