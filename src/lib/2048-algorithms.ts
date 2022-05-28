@@ -12,14 +12,16 @@ export default class Game2048 {
 	y: number;
 	constructor(x: number = 4, y?: number) {
 		if (!y) y = x;
-		this.x = x
-		this.y = y
+		this.x = x;
+		this.y = y;
 
-		this.reset()
+		this.reset();
 	}
 
 	reset() {
-		this.data = Array.from({ length: this.y }, () => Array.from({ length: this.x }, (_) => this._newTile(0)));
+		this.data = Array.from({ length: this.y }, () =>
+			Array.from({ length: this.x }, (_) => this._newTile(0))
+		);
 		this.insertTile();
 		this.insertTile();
 		this.score = 0;
@@ -45,14 +47,18 @@ export default class Game2048 {
 	}
 
 	isFull() {
-		let isAdjacentValues = false
-		for(let i=0; i<this.y; i++) {
-			for(let j=0; j<this.x; j++) {
-				if(this.data[i][j].value === this.data[i][j+1].value) {
-					isAdjacentValues= true
+		let isAdjacentValues = false;
+		for (let i = 0; i < this.y; i++) {
+			for (let j = 0; j < this.x - 1; j++) {
+				if (this.data[i][j].value === this.data[i][j + 1].value) {
+					isAdjacentValues = true;
 				}
-				if(this.data[i][j].value === this.data[i+1][j].value) {
-					isAdjacentValues = true
+			}
+		}
+		for (let i = 0; i < this.y - 1; i++) {
+			for (let j = 0; j < this.x; j++) {
+				if (this.data[i][j].value === this.data[i + 1][j]?.value) {
+					isAdjacentValues = true;
 				}
 			}
 		}
@@ -125,64 +131,62 @@ export default class Game2048 {
 			for (let j = 0; j < matrix[0].length; j++) {
 				arr.push(matrix[j][i]);
 			}
-			
+
 			const sorted = this._moveRow(arr);
 			for (let j = 0; j < matrix[0].length; j++) {
 				matrix[j][i] = sorted[j];
 			}
 		}
-		
+
 		return matrix;
 	}
 
 	_getValue(row: TileData[]) {
-		return row.map(r => r.value)
+		return row.map((r) => r.value);
 	}
 	_dataToString() {
-		return JSON.stringify(this.data.map(row => this._getValue(row)))
+		return JSON.stringify(this.data.map((row) => this._getValue(row)));
 	}
 
 	moveLeft() {
-		this.moved = false
-		const beforeMove = this._dataToString()
+		this.moved = false;
+		const beforeMove = this._dataToString();
 		for (let i = 0; i < this.data.length; i++) {
 			const row = this.data[i];
 			this.data[i] = this._moveRow(row);
 		}
-		const afterMove = this._dataToString()
-		this.moved = beforeMove !== afterMove
+		const afterMove = this._dataToString();
+		this.moved = beforeMove !== afterMove;
 		if (this.moved) this.insertTile();
 	}
 
 	moveRight() {
-		this.moved = false
-		const beforeMove = this._dataToString()
+		this.moved = false;
+		const beforeMove = this._dataToString();
 		for (let i = 0; i < this.data.length; i++) {
 			const row = JSON.parse(JSON.stringify(this.data[i])).reverse();
 			this.data[i] = this._moveRow(row).reverse();
 		}
-		const afterMove = this._dataToString()
-		this.moved = beforeMove !== afterMove
+		const afterMove = this._dataToString();
+		this.moved = beforeMove !== afterMove;
 		if (this.moved) this.insertTile();
 	}
 	moveTop() {
-		this.moved = false
-		const beforeMove = this._dataToString()		
+		this.moved = false;
+		const beforeMove = this._dataToString();
 		this._moveVertical(this.data);
-		const afterMove = this._dataToString()
-		this.moved = beforeMove !== afterMove
+		const afterMove = this._dataToString();
+		this.moved = beforeMove !== afterMove;
 
 		if (this.moved) this.insertTile();
 	}
 
 	moveBottom() {
-		const beforeMove = this._dataToString()
+		const beforeMove = this._dataToString();
 		this._moveVertical(this.data.reverse()).reverse();
-		const afterMove = this._dataToString()
+		const afterMove = this._dataToString();
 
-
-		this.moved = beforeMove !== afterMove
+		this.moved = beforeMove !== afterMove;
 		if (this.moved) this.insertTile();
 	}
 }
-
