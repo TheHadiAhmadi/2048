@@ -2,15 +2,15 @@
     "name": "2048",
     "short_name": "2048",
     "icons": [{
-        "src": "/favicon.png",
+        "src": "/logo.png",
         "sizes": "128x128",
         "type": "image/png"
     }, {
-        "src": "/favicon.png",
+        "src": "/logo.png",
         "sizes": "144x144",
         "type": "image/png"
     }, {
-        "src": "/favicon.png",
+        "src": "/logo.png",
         "sizes": "152x152",
         "type": "image/png"
     }],

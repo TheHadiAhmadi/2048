@@ -8,9 +8,18 @@ export default class Game2048 {
 	score: number = 0;
 	nextId: number = 0;
 	moved: boolean = false;
+	x: number;
+	y: number;
 	constructor(x: number = 4, y?: number) {
 		if (!y) y = x;
-		this.data = Array.from({ length: y }, () => Array.from({ length: x }, (_) => this._newTile(0)));
+		this.x = x
+		this.y = y
+
+		this.reset()
+	}
+
+	reset() {
+		this.data = Array.from({ length: this.y }, () => Array.from({ length: this.x }, (_) => this._newTile(0)));
 		this.insertTile();
 		this.insertTile();
 		this.score = 0;
