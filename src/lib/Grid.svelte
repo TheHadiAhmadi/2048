@@ -4,6 +4,7 @@
 	import { onMount } from 'svelte';
 	import drag from './drag';
 
+	let bestScore = 0;
 	let board: HTMLDivElement;
 	const game = new Game2048();
 
@@ -18,9 +19,10 @@
 		data = game.getData();
 		score = game.getScore();
 
-		game.debug()
+		game.debug();
 		if (game.isFull()) {
 			console.log('gameOver');
+			localStorage.setItem('best-score', JSON.stringify(Math.max(score, bestScore)));
 			gameOver = true;
 			return;
 		}
@@ -71,6 +73,7 @@
 	let activeTiles: Record<string, any> = {};
 
 	onMount(() => {
+		bestScore = JSON.parse(localStorage.getItem('best-score') || '0');
 		window.addEventListener('keydown', (e) => {
 			if (e.key === 'ArrowDown') clickBottom();
 			if (e.key === 'ArrowUp') clickTop();
@@ -124,7 +127,8 @@
 
 	function reset() {
 		game.reset();
-		gameOver = false
+		gameOver = false;
+		bestScore = JSON.parse(localStorage.getItem('best-score') ?? '0');
 		updateData();
 	}
 </script>
@@ -138,7 +142,7 @@
 		</div>
 		<div class="score-btn">
 			<span class="text-center font-bold text-gray-400 uppercase text-sm">best</span>
-			<div class="text-xl font-bold text-gray-300">{score}</div>
+			<div class="text-xl font-bold text-gray-300">{Math.max(score, bestScore)}</div>
 		</div>
 	</div>
 </div>
@@ -157,12 +161,14 @@
 </div>
 <div class="flex flex-col sm:flex-row">
 	{#if gameOver}
-	<div class="absolute z-1 left-0 right-0 top-0 bottom-0 font-bold text-gray-800 w-full h-full bg-gray-500/20 flex flex-col items-center justify-center text-3xl text-shadow">
-		<span>Game Over</span>
-		<button on:click={reset} class="p-2 mt-4 text-sm bg-gray-800 text-white shadow rounded">Reload</button>
-
-
-	</div>
+		<div
+			class="absolute z-1 left-0 right-0 top-0 bottom-0 font-bold text-gray-800 w-full h-full bg-gray-500/20 flex flex-col items-center justify-center text-3xl text-shadow"
+		>
+			<span>Game Over</span>
+			<button on:click={reset} class="p-2 mt-4 text-sm bg-gray-800 text-white shadow rounded"
+				>Reload</button
+			>
+		</div>
 	{/if}
 
 	<div
@@ -170,27 +176,26 @@
 		bind:this={board}
 		class="relative rounded w-300px sm:w-400px sm:h-400px md:(w-500px h-500px) p-0.75 h-300px grid grid-cols-4 grid-rows-4 bg-gray-400"
 	>
-			{#each Object.entries(activeTiles) as [key, value] (key)}
-				<span
+		{#each Object.entries(activeTiles) as [key, value] (key)}
+			<span
+				id={key}
+				class:hidden={value.value === 0}
+				style:left="{value.position.x}px"
+				style:top="{value.position.y}px"
+				class:animate-bubble={value.state === 'merged'}
+				class:animate-delay-200={value.state === 'merged'}
+				class:animate-zoom-in={value.state === 'new'}
+				class="animate-duration-400 transition-transform duration-1000 absolute inline-block w-1/4 h-1/4 p-1.5"
+			>
+				<Tile
+					prevPos={value.prevPos}
+					position={value.position}
 					id={key}
-					class:hidden={value.value === 0}
-					style:left="{value.position.x}px"
-					style:top="{value.position.y}px"
-					class:animate-bubble={value.state === 'merged'}
-					class:animate-delay-200={value.state === 'merged'}
-					class:animate-zoom-in={value.state === 'new'}
-					class="animate-duration-400 transition-transform duration-1000 absolute inline-block w-1/4 h-1/4 p-1.5"
-				>
-					<Tile
-						prevPos={value.prevPos}
-						position={value.position}
-						id={key}
-						state={value.state}
-						number={value.value}
-					/>
-				</span>
-			{/each}
-		
+					state={value.state}
+					number={value.value}
+				/>
+			</span>
+		{/each}
 
 		{#each [0, 0, 0, 0] as _i, i}
 			{#each [0, 0, 0, 0] as _j, j}
