@@ -145,9 +145,9 @@
 
 <div
 	use:drag={{ axis: 'both', handleMove }}
-	class="w-full h-full px-2 py-6 bg-gradient-to-br from-yellow-200 to-orange-200"
+	class="w-full h-full px-4 py-6 bg-yellow-100"
 >
-	<div class="h-full max-w-300px sm:max-w-400px md:max-w-500px mx-auto">
+	<div class="flex flex-col justify-start sm:gap-4 h-full sm:max-w-400px md:max-w-500px mx-auto">
 		<div class="flex w-full items-center">
 			<div class="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-700 flex-1">2048</div>
 			<div class="flex flex-row gap-1">
@@ -199,7 +199,8 @@
 
 			<div
 				bind:this={board}
-				class="relative rounded w-300px sm:w-400px sm:h-400px md:(w-500px h-500px) p-0.75 h-300px grid grid-cols-4 grid-rows-4 bg-gray-400"
+				style="aspect-ratio: 1;"
+				class="relative rounded p-0.75 grid grid-cols-4 grid-rows-4 bg-gray-400"
 			>
 				{#each Object.entries(activeTiles) as [key, value] (key)}
 					<span

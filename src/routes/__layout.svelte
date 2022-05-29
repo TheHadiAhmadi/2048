@@ -18,6 +18,7 @@ import { onMount } from 'svelte';
     body {
         overscroll-behavior-y: contain;
         overflow: hidden;
+        user-select: none;
     }
 
     body > div {
