@@ -147,7 +147,7 @@
 	use:drag={{ axis: 'both', handleMove }}
 	class="w-full h-full px-4 py-6 bg-yellow-100"
 >
-	<div class="flex flex-col justify-start sm:gap-4 h-full sm:max-w-400px md:max-w-500px mx-auto">
+	<div class="flex flex-col justify-start  h-full max-w-400px mx-auto">
 		<div class="flex w-full items-center">
 			<div class="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-700 flex-1">2048</div>
 			<div class="flex flex-row gap-1">
