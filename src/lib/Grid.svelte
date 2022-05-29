@@ -1,28 +1,46 @@
 <script lang="ts">
 	import Tile from './Tile.svelte';
-	import Game2048 from './2048-algorithms';
+	import Game2048, { type TileData } from './2048-algorithms';
 	import { onMount } from 'svelte';
-	import drag from './drag';
+	import drag, { type DragOptions } from './drag';
 
-	let bestScore = 0;
-	let board: HTMLDivElement;
+	type Position = [x: number, y: number];
+	type ActiveTile = {
+		position: Position;
+		prevPos: Position;
+		state: string;
+		value: number;
+	};
+
 	const game = new Game2048();
 
-	let score = game.getScore();
-	let data = game.getData();
-	let prevData = game.getData();
+	let activeTiles: Record<string, ActiveTile> = {};
 
-	let showButtons =false;
-	let gameOver = false;
+	let bestScore: number = 0;
+
+	let board: HTMLDivElement;
+
+	let data: TileData[][] = game.getData();
+
+	let gameOver: boolean = false;
+
+	let positions: Position[][] = [[], [], [], []];
+
+	let score: number = game.getScore();
+
+	let showShowButton: boolean = false;
+
+	let showButtons: boolean = false;
+
+	let tiles: HTMLSpanElement[][] = [[], [], [], []];
 
 	function updateData() {
-		prevData = data;
 		data = game.getData();
 		score = game.getScore();
 
-		if(gameOver) return;
+		if (gameOver) return;
 
-		let savedPositions: any = {};
+		let savedPositions: Record<string, Position> = {};
 		Object.entries(activeTiles).map(([key, value]) => {
 			savedPositions[key] = activeTiles[key].position;
 		});
@@ -32,22 +50,23 @@
 				const tile = data[i][j];
 				if (tile.value === 0) continue;
 
-				if (!activeTiles[tile.id]) activeTiles[tile.id] = {};
-
-				activeTiles[tile.id].position = positions[i][j];
-				activeTiles[tile.id].prevPos = savedPositions[tile.id] ?? activeTiles[tile.id].position;
-				activeTiles[tile.id].state = tile.state;
-				activeTiles[tile.id].value = tile.value;
+				if (!activeTiles[tile.id]) {
+					activeTiles[tile.id] = {
+						position: positions[i][j],
+						prevPos: savedPositions[tile.id] ?? positions[i][j],
+						state: tile.state!,
+						value: tile.value
+					};
+				}
 			}
 		}
 		if (game.isFull()) {
 			console.log('gameOver');
 			localStorage.setItem('best-score', JSON.stringify(Math.max(score, bestScore)));
 			gameOver = true;
-			
+
 			return;
 		}
-
 	}
 
 	function clickLeft() {
@@ -67,13 +86,6 @@
 		updateData();
 	}
 
-	let tiles: any[][] = [[], [], [], []];
-	let positions = [[], [], [], []];
-
-	let showShowButton = false
-
-	let activeTiles: Record<string, any> = {};
-
 	onMount(() => {
 		bestScore = JSON.parse(localStorage.getItem('best-score') || '0');
 		window.addEventListener('keydown', (e) => {
@@ -87,24 +99,20 @@
 
 		for (let i = 0; i < 4; i++) {
 			for (let j = 0; j < 4; j++) {
-				const rect = tiles[i][j].getClientRects()[0];
-				positions[i][j] = {
-					x: rect.x - boardRect.x,
-					y: rect.y - boardRect.y
-				};
+				const rect: DOMRect = tiles[i][j].getClientRects()[0];
+				positions[i][j] = [rect.x - boardRect.x, rect.y - boardRect.y];
 			}
 		}
 
-		if(window.innerHeight < 700) {
-			showShowButton = false
+		if (window.innerHeight < 700) {
+			showShowButton = false;
 		} else {
-			showShowButton = true
-
+			showShowButton = true;
 		}
 		updateData();
 	});
 
-	function handleMove({ detail }) {
+	function handleMove({ detail }: { detail: DragOptions }) {
 		console.log(detail);
 		const dx = detail.delta[0];
 		const dy = detail.delta[1];
@@ -127,7 +135,6 @@
 		}
 	}
 
-
 	function reset() {
 		game.reset();
 		gameOver = false;
@@ -136,126 +143,139 @@
 	}
 </script>
 
-
-<div 
-use:drag={{ axis: 'both', handleMove }}
-
-class="w-full h-full px-2 py-6 bg-gradient-to-br from-yellow-200 to-orange-200">
+<div
+	use:drag={{ axis: 'both', handleMove }}
+	class="w-full h-full px-2 py-6 bg-gradient-to-br from-yellow-200 to-orange-200"
+>
 	<div class="h-full max-w-300px sm:max-w-400px md:max-w-500px mx-auto">
-
-
-<div class="flex w-full items-center">
-	<div class="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-700 flex-1">2048</div>
-	<div class="flex flex-row gap-1">
-		<div class="score-btn">
-			<span class="text-center font-bold text-gray-200 uppercase text-xs">score</span>
-			<div class="text-2xl font-bold text-gray-100">{score}</div>
-		</div>
-		<div class="score-btn">
-			<span class="text-center font-bold text-gray-200 uppercase text-xs">best</span>
-			<div class="text-xl font-bold text-gray-100">{Math.max(score, bestScore)}</div>
-		</div>
-	</div>
-</div>
-
-<div class="flex flex-row items-center gap-1 my-4">
-	<p class="text-gray-600 flex-1">
-		Join the tiles, get to <b class="font-bold">2048!</b>
-	</p>
-	<button on:click={reset} class="sm:hidden py-1 px-5 ml-4 font-bold rounded bg-gray-700/30 hover:bg-gray-700/40 text-white"
-		>New</button
-	>
-	<button
-		on:click={reset}
-		class="hidden sm:block  py-1 px-5 ml-4 font-bold rounded bg-gray-700/30 hover:bg-gray-700/40 text-white">New Game</button
-	>
-</div>
-<div 
-		class="flex flex-col">
-	{#if gameOver}
-		<div
-			class="absolute z-1 left-0 right-0 top-0 bottom-0 font-bold text-gray-800 w-full h-full bg-gray-200/30 backdrop-filter  backdrop-blur-sm flex flex-col items-center justify-center text-5xl text-shadow"
-		>
-			<span>Game Over</span>
-			<span class="text-lg font-semibold mt-2">Your Score was: <b class="font-extrabold">{score}</b></span>
-			<button on:click={reset} class="px-6 py-4 mt-8 text-xl font-extrabold bg-gray-800 hover:bg-gray-700 hover:shadow-lg text-white shadow rounded"
-				>Reload</button
-			>
-		</div>
-	{/if}
-
-	<div
-		bind:this={board}
-		class="relative rounded w-300px sm:w-400px sm:h-400px md:(w-500px h-500px) p-0.75 h-300px grid grid-cols-4 grid-rows-4 bg-gray-400"
-	>
-		{#each Object.entries(activeTiles) as [key, value] (key)}
-			<span
-				id={key}
-				class:hidden={value.value === 0}
-				style:left="{value.position.x}px"
-				style:top="{value.position.y}px"
-				class:animate-bubble={value.state === 'merged'}
-				class:animate-delay-200={value.state === 'merged'}
-				class:animate-zoom-in={value.state === 'new'}
-				class="animate-duration-400 transition-transform duration-1000 absolute inline-block w-1/4 h-1/4 p-1.5"
-			>
-				<Tile
-					prevPos={value.prevPos}
-					position={value.position}
-					id={key}
-					state={value.state}
-					number={value.value}
-				/>
-			</span>
-		{/each}
-
-		{#each [0, 0, 0, 0] as _i, i}
-			{#each [0, 0, 0, 0] as _j, j}
-				<div bind:this={tiles[i][j]} class="p-1.5 w-full h-full">
-					<div class="bg-gray-300/50 rounded w-full h-full" />
+		<div class="flex w-full items-center">
+			<div class="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-700 flex-1">2048</div>
+			<div class="flex flex-row gap-1">
+				<div class="score-btn">
+					<span class="text-center font-bold text-gray-200 uppercase text-xs">score</span>
+					<div class="text-2xl font-bold text-gray-100">{score}</div>
 				</div>
-			{/each}
-		{/each}
-	</div>
-
-	{#if showButtons}
-	<div class="sm:hidden relative left-0 right-0 top-0 w-full p-2 bg-gray-500/20 border border-gray-500/30 rounded shadow mt-4 right-50 flex flex-col items-center justify-center gap-2 mb-2">
-		<button on:click={() => showButtons=false} class="absolute top-0 right-0 py-0 px-2 text-black/30 text-4xl">
-			&times;
-		</button>
-		<div
-			on:click={clickTop}
-			class="w-20 h-10 flex items-start justify-center p-1 bg-gray-400/90 shadow hover:shadow-lg cursor-pointer text-white text-shadow rounded hover:bg-gray-400"
-		>
-			Top
-		</div>
-		<div class="flex flex-row gap-4">
-			<div
-				on:click={clickLeft}
-				class="w-20 h-10 flex items-start justify-center p-1 bg-gray-400/90 shadow hover:shadow-lg cursor-pointer text-white text-shadow rounded hover:bg-gray-400"
-			>
-				Left
-			</div>
-			<div
-				on:click={clickRight}
-				class="w-20 h-10 flex items-start justify-center p-1 bg-gray-400/90 shadow hover:shadow-lg cursor-pointer text-white text-shadow rounded hover:bg-gray-400"
-			>
-				Right
+				<div class="score-btn">
+					<span class="text-center font-bold text-gray-200 uppercase text-xs">best</span>
+					<div class="text-xl font-bold text-gray-100">{Math.max(score, bestScore)}</div>
+				</div>
 			</div>
 		</div>
 
-		<div
-			on:click={clickBottom}
-			class="w-20 h-10 flex items-start justify-center p-1 bg-gray-400/90 shadow hover:shadow-lg cursor-pointer text-white text-shadow rounded hover:bg-gray-400"
-		>
-			Bottom
+		<div class="flex flex-row items-center gap-1 my-4">
+			<p class="text-gray-600 flex-1">
+				Join the tiles, get to <b class="font-bold">2048!</b>
+			</p>
+			<button
+				on:click={reset}
+				class="sm:hidden py-1 px-5 ml-4 font-bold rounded bg-gray-700/30 hover:bg-gray-700/40 text-white"
+			>
+				New
+			</button>
+			<button
+				on:click={reset}
+				class="hidden sm:block  py-1 px-5 ml-4 font-bold rounded bg-gray-700/30 hover:bg-gray-700/40 text-white"
+			>
+				New Game
+			</button>
+		</div>
+		<div class="flex flex-col">
+			{#if gameOver}
+				<div
+					class="absolute z-1 left-0 right-0 top-0 bottom-0 font-bold text-gray-800 w-full h-full bg-gray-200/30 backdrop-filter  backdrop-blur-sm flex flex-col items-center justify-center text-5xl text-shadow"
+				>
+					<span>Game Over</span>
+					<span class="text-lg font-semibold mt-2">
+						Your Score was: <b class="font-extrabold">{score}</b>
+					</span>
+					<button
+						on:click={reset}
+						class="px-6 py-4 mt-8 text-xl font-extrabold bg-gray-800 hover:bg-gray-700 hover:shadow-lg text-white shadow rounded"
+					>
+						Reload
+					</button>
+				</div>
+			{/if}
+
+			<div
+				bind:this={board}
+				class="relative rounded w-300px sm:w-400px sm:h-400px md:(w-500px h-500px) p-0.75 h-300px grid grid-cols-4 grid-rows-4 bg-gray-400"
+			>
+				{#each Object.entries(activeTiles) as [key, value] (key)}
+					<span
+						id={key}
+						class:hidden={value.value === 0}
+						style:left="{value.position[0]}px"
+						style:top="{value.position[1]}px"
+						class:animate-bubble={value.state === 'merged'}
+						class:animate-zoom-in={value.state === 'new'}
+						class:animate-delay-150={value.state === 'merged'}
+						class="animate-duration-400 absolute inline-block w-1/4 h-1/4 p-1.5"
+					>
+						<Tile
+							prevPos={value.prevPos}
+							position={value.position}
+							id={key}
+							state={value.state}
+							number={value.value}
+						/>
+					</span>
+				{/each}
+
+				{#each [0, 0, 0, 0] as _i, i}
+					{#each [0, 0, 0, 0] as _j, j}
+						<div bind:this={tiles[i][j]} class="p-1.5 w-full h-full">
+							<div class="bg-gray-300/50 rounded w-full h-full" />
+						</div>
+					{/each}
+				{/each}
+			</div>
+
+			{#if showButtons}
+				<div
+					class="sm:hidden relative left-0 right-0 top-0 w-full p-2 bg-gray-500/20 border border-gray-500/30 rounded shadow mt-4 right-50 flex flex-col items-center justify-center gap-2 mb-2"
+				>
+					<button
+						on:click={() => (showButtons = false)}
+						class="absolute top-0 right-0 py-0 px-2 text-black/30 text-4xl"
+					>
+						&times;
+					</button>
+					<div
+						on:click={clickTop}
+						class="w-20 h-10 flex items-start justify-center p-1 bg-gray-400/90 shadow hover:shadow-lg cursor-pointer text-white text-shadow rounded hover:bg-gray-400"
+					>
+						Top
+					</div>
+					<div class="flex flex-row gap-4">
+						<div
+							on:click={clickLeft}
+							class="w-20 h-10 flex items-start justify-center p-1 bg-gray-400/90 shadow hover:shadow-lg cursor-pointer text-white text-shadow rounded hover:bg-gray-400"
+						>
+							Left
+						</div>
+						<div
+							on:click={clickRight}
+							class="w-20 h-10 flex items-start justify-center p-1 bg-gray-400/90 shadow hover:shadow-lg cursor-pointer text-white text-shadow rounded hover:bg-gray-400"
+						>
+							Right
+						</div>
+					</div>
+
+					<div
+						on:click={clickBottom}
+						class="w-20 h-10 flex items-start justify-center p-1 bg-gray-400/90 shadow hover:shadow-lg cursor-pointer text-white text-shadow rounded hover:bg-gray-400"
+					>
+						Bottom
+					</div>
+				</div>
+			{:else if showShowButton}
+				<button
+					on:click={() => (showButtons = true)}
+					class="sm:hidden p-2 bg-gray-500/20 border border-gray-500/30  hover:bg-gray-500/30 text-black rounded mt-2"
+					>Show Buttons</button
+				>
+			{/if}
 		</div>
 	</div>
-	{:else}
-	{#if showShowButton}
-		<button on:click={() => showButtons = true} class="sm:hidden p-2 bg-gray-500/20 border border-gray-500/30  hover:bg-gray-500/30 text-black rounded mt-2">Show Buttons</button>
-	{/if}
-	{/if}
-</div>
-</div>
 </div>

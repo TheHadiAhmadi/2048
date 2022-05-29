@@ -1,12 +1,9 @@
 <script lang="ts">
-	import { createEventDispatcher, onMount } from 'svelte';
 
-	import { fly, scale } from 'svelte/transition';
+	import { fly } from 'svelte/transition';
 	export let number = 0;
-    export let prevPos
-    export let position
-    export let state
-    export let id
+    export let prevPos: [x: number, y: number] = [0, 0]
+    export let position: [x: number, y: number] = [0, 0]
 
 	let size = '';
 
@@ -29,16 +26,20 @@
 		32768: '#ff410a'
 	};
 
-	let el;
-	let _in = () => {};
-    let params: any = { delay: 200 };
+	let _in: any = () => {};
+    let params: any = { delay: 100 };
 
 
     $: if (prevPos === position) {
-		_in = scale;
+		_in = () => {};
 	} else {
         _in = fly
-        params = {duration: 100, x: prevPos.x - position.x, y: prevPos.y - position.y, opacity: 1}
+        params = {
+			duration: 150, 
+			x: prevPos[0] - position[0], 
+			y: prevPos[1] - position[1], 
+			opacity: 1
+		}
     }
 
 	$: if (number < 100) {
@@ -48,13 +49,12 @@
 	} else {
 		size = 'text-xl sm:text-2xl md:text-3xl';
 	}
+
 </script>
 
 {#key params}
 <div
-bind:this={el}
     in:_in={params}
-    id="{JSON.stringify(params)}"
 	class="flex items-center justify-center transition-transform shadow-lg font-bold rounded text-shadow w-full h-full bg-gray-300 {size}"
 	style:color={number <= 4 ? '#606060' : '#f0f0f0'}
 	style:background-color={colors[number]}
