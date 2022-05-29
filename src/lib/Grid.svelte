@@ -179,6 +179,9 @@
 				New Game
 			</button>
 		</div>
+		<div class="text-gray-800 mb-4">
+			You can play Original Game <a class="font-bold text-blue-700" href="https://play2048.co/">here</a>
+		</div>
 		<div class="flex flex-col">
 			{#if gameOver}
 				<div
